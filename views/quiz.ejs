@@ -1,0 +1,35 @@
+<%- include('partials/head', { title: quiz.title }) %>
+<section class="exam-heading">
+  <div>
+    <p class="eyebrow">Mock exam</p>
+    <h1><%= quiz.title %></h1>
+    <p class="muted"><%= quiz.questions.length %> questions · Choose one answer each</p>
+  </div>
+  <div class="exam-progress" aria-live="polite">
+    <strong><span id="answered-count">0</span> / <%= quiz.questions.length %></strong>
+    <span>answered</span>
+    <div class="progress-track"><span id="progress-fill"></span></div>
+  </div>
+</section>
+<% if (reused) { %><div class="notice">We found this material in your library, so no new questions were generated.</div><% } %>
+<form class="exam-form" id="exam-form" action="/quizzes/<%= quiz.id %>/submit" method="post" data-question-count="<%= quiz.questions.length %>">
+  <% quiz.questions.forEach(function(question, index) { %>
+    <section class="card question-card">
+      <div class="question-heading">
+        <span class="question-number"><%= String(index + 1).padStart(2, '0') %></span>
+        <h2><%= question.prompt %></h2>
+      </div>
+      <div class="answer-list" role="radiogroup" aria-label="Question <%= index + 1 %>">
+        <% question.options.forEach(function(option, optionIndex) { %>
+          <label class="answer-option">
+            <input type="radio" name="question_<%= question.id %>" value="<%= optionIndex %>" required>
+            <span class="radio-mark" aria-hidden="true"></span>
+            <span class="answer-copy"><%= option %></span>
+          </label>
+        <% }) %>
+      </div>
+    </section>
+  <% }) %>
+  <div class="exam-actions"><button type="submit">Finish exam <span aria-hidden="true">→</span></button></div>
+</form>
+<%- include('partials/foot') %>

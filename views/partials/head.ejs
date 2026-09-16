@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> · Lecture Quiz</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="<%= currentUser ? '/dashboard' : '/' %>"><span aria-hidden="true">LQ</span>Lecture Quiz</a>
+    <% if (currentUser) { %>
+      <nav aria-label="Main navigation">
+        <span class="welcome">Hi, <%= currentUser %></span>
+        <a href="/quizzes/new">New quiz</a>
+        <form action="/logout" method="post"><button class="nav-button" type="submit">Logout</button></form>
+      </nav>
+    <% } %>
+  </header>
+  <main class="container">

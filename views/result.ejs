@@ -1,0 +1,19 @@
+<%- include('partials/head', { title: 'Results' }) %>
+<section class="card score-card">
+  <p class="eyebrow">Exam complete</p>
+  <h1><%= score %> / <%= quiz.questions.length %></h1>
+  <p class="muted"><%= Math.round(score / quiz.questions.length * 100) %>% correct</p>
+  <a class="button secondary" href="/quizzes/<%= quiz.id %>">Try again</a>
+  <a class="button secondary" href="/dashboard">Dashboard</a>
+  <a class="button" href="/quizzes/new">New quiz</a>
+</section>
+<h2>Review</h2>
+<% results.forEach(function(item, index) { %>
+  <section class="card review <%= item.isCorrect ? 'correct' : 'incorrect' %>">
+    <h3><%= index + 1 %>. <%= item.prompt %></h3>
+    <p>Your answer: <strong><%= item.selectedIndex === null ? 'No answer' : item.options[item.selectedIndex] %></strong></p>
+    <% if (!item.isCorrect) { %><p>Correct answer: <strong><%= item.options[item.correct_index] %></strong></p><% } %>
+    <% if (item.explanation) { %><p class="muted"><%= item.explanation %></p><% } %>
+  </section>
+<% }) %>
+<%- include('partials/foot') %>

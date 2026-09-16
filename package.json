@@ -1,0 +1,23 @@
+{
+  "name": "lecture-quiz",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Generate multiple-choice quizzes from lecture PDFs with Ollama.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^11.8.1",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "multer": "^2.0.2",
+    "pdf-parse": "^1.1.1"
+  }
+}

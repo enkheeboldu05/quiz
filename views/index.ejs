@@ -1,0 +1,41 @@
+<%- include('partials/head', { title: 'Create a quiz' }) %>
+<section class="card hero">
+  <p class="eyebrow">Create a new study set</p>
+  <h1>Turn a lecture into a quiz.</h1>
+  <p class="muted">Upload a text-based PDF and AI will create a focused multiple-choice exam.</p>
+  <p class="reuse-note">Already uploaded this material? We’ll open your saved questions without calling AI again.</p>
+  <% if (error) { %><div class="alert" role="alert"><%= error %></div><% } %>
+  <form id="quiz-generator-form" action="/quizzes" method="post" enctype="multipart/form-data">
+    <div class="field">
+      <label for="title">Quiz name</label>
+      <input id="title" name="title" type="text" maxlength="100" placeholder="e.g. Software Engineering — Week 1" required>
+    </div>
+    <div class="field">
+      <label for="lecture">Lecture PDF</label>
+      <input id="lecture" name="lecture" type="file" accept="application/pdf,.pdf" required>
+    </div>
+    <div class="field compact-field">
+      <label for="questionCount">Number of questions</label>
+      <input id="questionCount" name="questionCount" type="number" min="1" max="20" value="5" required>
+    </div>
+    <button class="wide-button" type="submit">Generate quiz <span aria-hidden="true">→</span></button>
+    <p class="hint">Generation time depends on the selected AI provider and document length.</p>
+  </form>
+  <a class="text-link" href="/dashboard">← Back to dashboard</a>
+</section>
+
+<div class="generation-overlay" id="generation-overlay" hidden aria-live="polite" aria-labelledby="generation-title">
+  <div class="generation-panel">
+    <div class="generation-spinner" aria-hidden="true"></div>
+    <p class="eyebrow">Building your study set</p>
+    <h2 id="generation-title">Reading your lecture…</h2>
+    <p class="muted">Keep this tab open. Local models may need a few minutes.</p>
+    <ol class="generation-steps">
+      <li class="active">Extracting PDF text</li>
+      <li>Checking your saved library</li>
+      <li>Generating focused questions</li>
+      <li>Saving your quiz</li>
+    </ol>
+  </div>
+</div>
+<%- include('partials/foot') %>

@@ -1,0 +1,20 @@
+<%- include('partials/head', { title: 'Sign up' }) %>
+<section class="card auth-card">
+  <div class="auth-mark">LQ</div>
+  <p class="eyebrow">Build your study library</p>
+  <h1>Create an account.</h1>
+  <p class="muted">Your generated questions and scores will stay together in one place.</p>
+  <% if (error) { %><div class="alert" role="alert"><%= error %></div><% } %>
+  <form action="/signup" method="post">
+    <label for="username">Username</label>
+    <input id="username" name="username" minlength="2" maxlength="40" value="<%= values.username || '' %>" autocomplete="username" required>
+    <label for="email">Email</label>
+    <input id="email" type="email" name="email" value="<%= values.email || '' %>" autocomplete="email" required>
+    <label for="password">Password</label>
+    <input id="password" type="password" name="password" minlength="8" autocomplete="new-password" required>
+    <p class="hint">Use at least 8 characters.</p>
+    <button type="submit">Create account</button>
+  </form>
+  <p class="auth-switch">Already have an account? <a href="/login">Log in</a></p>
+</section>
+<%- include('partials/foot') %>

@@ -1,0 +1,17 @@
+<%- include('partials/head', { title: 'Log in' }) %>
+<section class="card auth-card">
+  <div class="auth-mark">LQ</div>
+  <p class="eyebrow">Welcome back</p>
+  <h1>Study smarter.</h1>
+  <p class="muted">Log in to reach your saved lectures and practice history.</p>
+  <% if (error) { %><div class="alert" role="alert"><%= error %></div><% } %>
+  <form action="/login" method="post">
+    <label for="email">Email</label>
+    <input id="email" type="email" name="email" value="<%= values.email || '' %>" autocomplete="email" required>
+    <label for="password">Password</label>
+    <input id="password" type="password" name="password" autocomplete="current-password" required>
+    <button type="submit">Log in</button>
+  </form>
+  <p class="auth-switch">New to Lecture Quiz? <a href="/signup">Create an account</a></p>
+</section>
+<%- include('partials/foot') %>

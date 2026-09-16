@@ -1,0 +1,40 @@
+<%- include('partials/head', { title: 'Dashboard' }) %>
+<section class="dashboard-heading">
+  <div><p class="eyebrow">Your study library</p><h1>Ready for another round?</h1><p class="muted">Revisit saved questions or turn a new lecture into a practice exam.</p></div>
+  <a class="button" href="/quizzes/new">+ Generate quiz</a>
+</section>
+
+<% if (!quizzes.length) { %>
+  <section class="card empty-state"><div>✦</div><h2>Your library is empty</h2><p class="muted">Upload a lecture PDF to create your first reusable study set.</p><a class="button" href="/quizzes/new">Create your first quiz</a></section>
+<% } else { %>
+  <div class="library-grid">
+    <% quizzes.forEach(quiz => { %>
+      <article class="card library-card">
+        <div class="card-top">
+          <div class="document-icon"><span></span><span></span><span></span></div>
+          <details class="quiz-menu">
+            <summary aria-label="Manage <%= quiz.title %>">•••</summary>
+            <div class="quiz-menu-panel">
+              <form action="/quizzes/<%= quiz.id %>/rename" method="post">
+                <label for="title-<%= quiz.id %>">Rename quiz</label>
+                <input id="title-<%= quiz.id %>" name="title" type="text" value="<%= quiz.title %>" maxlength="100" required>
+                <button class="small-button" type="submit">Save name</button>
+              </form>
+              <form action="/quizzes/<%= quiz.id %>/delete" method="post" data-confirm-delete>
+                <button class="small-button danger-button" type="submit">Delete quiz</button>
+              </form>
+            </div>
+          </details>
+        </div>
+        <div class="library-meta"><span><%= quiz.question_count || '—' %> questions</span><span><%= quiz.attempt_count %> attempts</span></div>
+        <h2><%= quiz.title %></h2>
+        <p class="filename"><%= quiz.source_filename %></p>
+        <div class="progress-row">
+          <div><small>Best score</small><strong><%= quiz.best_score === null ? 'Not taken' : quiz.best_score + ' / ' + quiz.question_count %></strong></div>
+          <a class="study-link" href="/quizzes/<%= quiz.id %>">Study again →</a>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+<% } %>
+<%- include('partials/foot') %>
