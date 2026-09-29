@@ -2,7 +2,7 @@
   "name": "lecture-quiz",
   "version": "1.0.0",
   "private": true,
-  "description": "Generate multiple-choice quizzes from lecture PDFs with Ollama.",
+  "description": "Generate grounded practice quizzes from lecture PDFs with Hugging Face.",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

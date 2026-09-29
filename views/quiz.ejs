@@ -3,7 +3,7 @@
   <div>
     <p class="eyebrow">Mock exam</p>
     <h1><%= quiz.title %></h1>
-    <p class="muted"><%= quiz.questions.length %> questions · Choose one answer each</p>
+    <p class="muted"><%= quiz.questions.length %> questions · Answer each question</p>
   </div>
   <div class="exam-progress" aria-live="polite">
     <strong><span id="answered-count">0</span> / <%= quiz.questions.length %></strong>
@@ -19,6 +19,8 @@
         <span class="question-number"><%= String(index + 1).padStart(2, '0') %></span>
         <h2><%= question.prompt %></h2>
       </div>
+      <p class="question-meta"><%= question.type.replaceAll('_', ' ') %> · <%= question.difficulty %></p>
+      <% if (question.type === 'multiple_choice' || question.type === 'true_false') { %>
       <div class="answer-list" role="radiogroup" aria-label="Question <%= index + 1 %>">
         <% question.options.forEach(function(option, optionIndex) { %>
           <label class="answer-option">
@@ -28,6 +30,15 @@
           </label>
         <% }) %>
       </div>
+      <% } else { %>
+        <label class="typed-answer"><span>Your answer</span>
+          <% if (question.type === 'short_answer') { %>
+            <textarea name="question_<%= question.id %>" rows="3" required></textarea>
+          <% } else { %>
+            <input type="text" name="question_<%= question.id %>" autocomplete="off" required>
+          <% } %>
+        </label>
+      <% } %>
     </section>
   <% }) %>
   <div class="exam-actions"><button type="submit">Finish exam <span aria-hidden="true">→</span></button></div>

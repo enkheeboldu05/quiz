@@ -4,7 +4,7 @@ module.exports = {
   port: Number(process.env.PORT) || 3000,
   databasePath: process.env.DATABASE_PATH || path.join(__dirname, '..', 'data', 'quiz.db'),
   uploadDir: path.join(__dirname, '..', 'uploads'),
-  llmProvider: (process.env.LLM_PROVIDER || 'ollama').toLowerCase(),
+  llmProvider: (process.env.LLM_PROVIDER || 'huggingface').toLowerCase(),
   huggingFace: {
     token: process.env.HF_TOKEN || '',
     model: process.env.HF_MODEL || 'Qwen/Qwen3-4B-Instruct-2507:cheapest',

@@ -2,13 +2,13 @@
 <section class="card hero">
   <p class="eyebrow">Create a new study set</p>
   <h1>Turn a lecture into a quiz.</h1>
-  <p class="muted">Upload a text-based PDF and AI will create a focused multiple-choice exam.</p>
+  <p class="muted">Upload a text-based PDF and create a focused practice exam.</p>
   <p class="reuse-note">Already uploaded this material? We’ll open your saved questions without calling AI again.</p>
   <% if (error) { %><div class="alert" role="alert"><%= error %></div><% } %>
   <form id="quiz-generator-form" action="/quizzes" method="post" enctype="multipart/form-data">
     <div class="field">
       <label for="title">Quiz name</label>
-      <input id="title" name="title" type="text" maxlength="100" placeholder="e.g. Software Engineering — Week 1" required>
+      <input id="title" name="title" type="text" maxlength="100" value="<%= values.title %>" placeholder="e.g. Software Engineering — Week 1" required>
     </div>
     <div class="field">
       <label for="lecture">Lecture PDF</label>
@@ -16,8 +16,24 @@
     </div>
     <div class="field compact-field">
       <label for="questionCount">Number of questions</label>
-      <input id="questionCount" name="questionCount" type="number" min="1" max="20" value="5" required>
+      <input id="questionCount" name="questionCount" type="number" min="1" max="20" value="<%= values.questionCount %>" required>
     </div>
+    <div class="field compact-field">
+      <label for="difficulty">Difficulty</label>
+      <select id="difficulty" name="difficulty">
+        <% ['basic', 'intermediate', 'advanced', 'mixed'].forEach(level => { %>
+          <option value="<%= level %>" <%= values.difficulty === level ? 'selected' : '' %>><%= level[0].toUpperCase() + level.slice(1) %></option>
+        <% }) %>
+      </select>
+    </div>
+    <fieldset class="field format-field">
+      <legend>Question formats</legend>
+      <div class="format-options">
+        <% [['multiple_choice', 'Multiple choice'], ['true_false', 'True / False'], ['fill_blank', 'Fill in blank'], ['short_answer', 'Short answer']].forEach(format => { %>
+          <label><input type="checkbox" name="questionTypes" value="<%= format[0] %>" <%= values.questionTypes.includes(format[0]) ? 'checked' : '' %>> <span><%= format[1] %></span></label>
+        <% }) %>
+      </div>
+    </fieldset>
     <button class="wide-button" type="submit">Generate quiz <span aria-hidden="true">→</span></button>
     <p class="hint">Generation time depends on the selected AI provider and document length.</p>
   </form>
@@ -29,7 +45,7 @@
     <div class="generation-spinner" aria-hidden="true"></div>
     <p class="eyebrow">Building your study set</p>
     <h2 id="generation-title">Reading your lecture…</h2>
-    <p class="muted">Keep this tab open. Local models may need a few minutes.</p>
+    <p class="muted">Keep this tab open while the questions are prepared.</p>
     <ol class="generation-steps">
       <li class="active">Extracting PDF text</li>
       <li>Checking your saved library</li>

@@ -1,4 +1,5 @@
 <%- include('partials/head', { title: 'Dashboard' }) %>
+<% const savedCollections = typeof collections === 'undefined' ? [] : collections; %>
 <section class="dashboard-heading">
   <div><p class="eyebrow">Your study library</p><h1>Ready for another round?</h1><p class="muted">Revisit saved questions or turn a new lecture into a practice exam.</p></div>
   <a class="button" href="/quizzes/new">+ Generate quiz</a>
@@ -7,14 +8,59 @@
 <% if (!quizzes.length) { %>
   <section class="card empty-state"><div>✦</div><h2>Your library is empty</h2><p class="muted">Upload a lecture PDF to create your first reusable study set.</p><a class="button" href="/quizzes/new">Create your first quiz</a></section>
 <% } else { %>
+  <section class="collection-bar" aria-label="Quiz collections">
+    <div class="collection-filters">
+      <button class="collection-filter active" type="button" data-collection-filter="all">All</button>
+      <button class="collection-filter" type="button" data-collection-filter="none">Unorganized</button>
+      <% savedCollections.forEach(collection => { %>
+        <button class="collection-filter" type="button" data-collection-filter="<%= collection.id %>"><%= collection.name %> <span><%= collection.quiz_count %></span></button>
+      <% }) %>
+    </div>
+    <details class="collection-manager">
+      <summary>Manage collections</summary>
+      <div class="collection-panel">
+        <form action="/collections" method="post" class="collection-create">
+          <input name="name" type="text" maxlength="50" placeholder="New collection" required>
+          <button class="small-button" type="submit">Add</button>
+        </form>
+        <% savedCollections.forEach(collection => { %>
+          <div class="collection-row">
+            <form action="/collections/<%= collection.id %>/rename" method="post">
+              <input name="name" type="text" maxlength="50" value="<%= collection.name %>" required>
+              <button class="small-button secondary" type="submit">Rename</button>
+            </form>
+            <form action="/collections/<%= collection.id %>/delete" method="post" data-confirm-collection-delete>
+              <button class="collection-delete" type="submit" aria-label="Delete <%= collection.name %>">×</button>
+            </form>
+          </div>
+        <% }) %>
+      </div>
+    </details>
+  </section>
+  <div class="library-tools">
+    <label for="quiz-search">Search saved quizzes</label>
+    <div class="search-field">
+      <span aria-hidden="true">⌕</span>
+      <input id="quiz-search" type="search" placeholder="Search by quiz or PDF name…" autocomplete="off">
+    </div>
+  </div>
   <div class="library-grid">
     <% quizzes.forEach(quiz => { %>
-      <article class="card library-card">
+      <article class="card library-card" data-quiz-card data-collection-id="<%= quiz.collection_id || 'none' %>" data-href="/quizzes/<%= quiz.id %>" tabindex="0" role="link" aria-label="Open <%= quiz.title %>">
         <div class="card-top">
           <div class="document-icon"><span></span><span></span><span></span></div>
           <details class="quiz-menu">
             <summary aria-label="Manage <%= quiz.title %>">•••</summary>
             <div class="quiz-menu-panel">
+              <form action="/quizzes/<%= quiz.id %>/collection" method="post">
+                <label for="collection-<%= quiz.id %>">Collection</label>
+                <select id="collection-<%= quiz.id %>" name="collectionId" onchange="this.form.submit()">
+                  <option value="">Unorganized</option>
+                  <% savedCollections.forEach(collection => { %>
+                    <option value="<%= collection.id %>" <%= quiz.collection_id === collection.id ? 'selected' : '' %>><%= collection.name %></option>
+                  <% }) %>
+                </select>
+              </form>
               <form action="/quizzes/<%= quiz.id %>/rename" method="post">
                 <label for="title-<%= quiz.id %>">Rename quiz</label>
                 <input id="title-<%= quiz.id %>" name="title" type="text" value="<%= quiz.title %>" maxlength="100" required>
@@ -36,5 +82,6 @@
       </article>
     <% }) %>
   </div>
+  <p class="library-no-results" id="library-no-results" hidden>No saved quizzes match that search.</p>
 <% } %>
 <%- include('partials/foot') %>

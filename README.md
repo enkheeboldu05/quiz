@@ -1,6 +1,6 @@
 # Lecture Quiz
 
-A minimal server-rendered quiz generator built with Node.js, Express, SQLite, EJS, and a swappable Ollama or Hugging Face provider. Accounts keep each student's generated quizzes, attempts, and scores private and available for later study.
+A minimal server-rendered quiz generator built with Node.js, Express, SQLite, EJS, and Hugging Face as the default LLM provider. Accounts keep each student's generated quizzes, attempts, and scores private and available for later study.
 
 ## Study library
 
@@ -21,8 +21,7 @@ A minimal server-rendered quiz generator built with Node.js, Express, SQLite, EJ
 cd /home/enkheeboldu/projects/lecture-quiz
 cp .env.example .env
 npm install
-ollama pull llama3.2
-ollama serve
+# Edit .env and replace HF_TOKEN with your Hugging Face token.
 ```
 
 In another terminal:
@@ -31,14 +30,14 @@ In another terminal:
 npm start
 ```
 
-Open <http://localhost:3000>. Run the parser tests with `npm test`.
+Open <http://localhost:3000>. Run the automated tests with `npm test`.
 
 ## Configuration
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `PORT` | `3000` | Web server port |
-| `LLM_PROVIDER` | `ollama` | `huggingface` or `ollama` |
+| `LLM_PROVIDER` | `huggingface` | `huggingface` or `ollama` |
 | `HF_TOKEN` | — | Hugging Face access token; required for the hosted provider |
 | `HF_MODEL` | `Qwen/Qwen3-4B-Instruct-2507:cheapest` | Hosted model and routing policy |
 | `OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Ollama API origin |
@@ -55,8 +54,12 @@ src/
   app.js                    Express routes and request flow
   db.js                     SQLite schema and data access
   providers/
+    generation-settings.js Generation settings and distribution validation
+    huggingface-provider.js Hugging Face implementation
     llm-provider.js         Provider contract
     ollama-provider.js      Ollama implementation
+    prompt-templates.js     Prompt templates and difficulty guidance
+    question-schema.js      Structured response schema
     parse-questions.js      JSON parsing and validation
     index.js                Provider factory
   services/pdf.js           PDF text extraction
@@ -70,9 +73,15 @@ test/                       Node test runner tests
 Create a class in `src/providers` that extends `LlmProvider` and implements:
 
 ```js
-async generateQuestions({ text, count }) {
+async generateQuestions({
+  text,
+  count,
+  difficulty,
+  types,
+  distribution
+}) {
   // Call the remote model, then return:
-  // [{ question, options, correctIndex, explanation }]
+  // [{ type, difficulty, question, options, correctAnswer,
 }
 ```
 

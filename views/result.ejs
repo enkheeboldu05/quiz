@@ -11,9 +11,10 @@
 <% results.forEach(function(item, index) { %>
   <section class="card review <%= item.isCorrect ? 'correct' : 'incorrect' %>">
     <h3><%= index + 1 %>. <%= item.prompt %></h3>
-    <p>Your answer: <strong><%= item.selectedIndex === null ? 'No answer' : item.options[item.selectedIndex] %></strong></p>
-    <% if (!item.isCorrect) { %><p>Correct answer: <strong><%= item.options[item.correct_index] %></strong></p><% } %>
+    <p>Your answer: <strong><%= item.submittedAnswer || 'No answer' %></strong></p>
+    <% if (!item.isCorrect) { %><p>Correct answer: <strong><%= item.correct_answer %></strong></p><% } %>
     <% if (item.explanation) { %><p class="muted"><%= item.explanation %></p><% } %>
+    <% if (item.source) { %><p class="source-excerpt"><span>Lecture source</span> “<%= item.source %>”</p><% } %>
   </section>
 <% }) %>
 <%- include('partials/foot') %>
