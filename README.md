@@ -1,94 +1,110 @@
 # Lecture Quiz
 
-A minimal server-rendered quiz generator built with Node.js, Express, SQLite, EJS, and Hugging Face as the default LLM provider. Accounts keep each student's generated quizzes, attempts, and scores private and available for later study.
+Lecture Quiz turns text-based lecture PDFs into reusable practice quizzes. It is a server-rendered student project built with Node.js, Express, EJS, SQLite, and a modular LLM provider layer. Hugging Face is the default provider.
 
-## Study library
+## Features
 
-- Sign up or log in to reach a private dashboard.
-- Generated questions and attempt scores remain in SQLite.
-- Uploading the same extracted PDF content again opens the existing quiz before any LLM request is made.
-- On upgrade, the first account claims quizzes created by the earlier single-user version.
-- Every quiz read and submission is scoped to the authenticated user.
+- Account sign-up, login, logout, and user-owned data
+- PDF text extraction and AI-generated questions
+- Multiple choice, True/False, fill-in-the-blank, and short-answer formats
+- Basic, intermediate, advanced, and mixed difficulty
+- Structured-response validation with one retry for invalid model output
+- Saved quizzes, scores, explanations, and lecture source excerpts
+- Reusable quiz collections for organizing related material
+- Dashboard search, collection filters, rename, move, and delete controls
+- Duplicate-generation protection for matching material and settings
+- Responsive EJS interface with no frontend framework
 
-## Requirements
+## Tech stack
 
-- Node.js 18 or newer
-- Either a Hugging Face token with Inference Providers permission or Ollama running locally
+- Node.js and Express
+- EJS and plain CSS/JavaScript
+- SQLite with `better-sqlite3`
+- `pdf-parse` for embedded PDF text
+- `bcrypt` and `express-session` for authentication
+- Hugging Face Inference Providers by default
+- Optional Ollama provider
 
-## Run it
+## Setup
+
+Requirements: Node.js 18+ and a Hugging Face token with inference permission.
 
 ```bash
 cd /home/enkheeboldu/projects/lecture-quiz
 cp .env.example .env
 npm install
-# Edit .env and replace HF_TOKEN with your Hugging Face token.
 ```
 
-In another terminal:
+Add your token to `.env`, then start the application:
+
+```env
+LLM_PROVIDER=huggingface
+HF_TOKEN=your_token_here
+```
 
 ```bash
 npm start
 ```
 
-Open <http://localhost:3000>. Run the automated tests with `npm test`.
+Open <http://localhost:3000>.
 
 ## Configuration
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `PORT` | `3000` | Web server port |
+| `PORT` | `3000` | Local web-server port |
 | `LLM_PROVIDER` | `huggingface` | `huggingface` or `ollama` |
-| `HF_TOKEN` | — | Hugging Face access token; required for the hosted provider |
+| `HF_TOKEN` | — | Hugging Face access token |
 | `HF_MODEL` | `Qwen/Qwen3-4B-Instruct-2507:cheapest` | Hosted model and routing policy |
-| `OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Ollama API origin |
-| `OLLAMA_MODEL` | `llama3.2` | Local model used for generation |
-| `MAX_PDF_CHARS` | `30000` | Maximum extracted text sent to the model |
-| `DATABASE_PATH` | `data/quiz.db` | Optional SQLite path |
+| `OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Local Ollama API URL |
+| `OLLAMA_MODEL` | `llama3.2` | Local Ollama model |
+| `MAX_PDF_CHARS` | `30000` | Maximum extracted characters sent to the model |
+| `DATABASE_PATH` | `data/quiz.db` | SQLite database location |
+| `SESSION_SECRET` | Random per startup | Session-signing secret; set a stable value locally |
 
-Generated databases and temporary uploads are ignored by Git. Uploaded files are deleted immediately after processing. `pdf-parse` extracts embedded text; image-only scans require OCR before upload.
+Never commit `.env` or access tokens. Temporary PDF uploads are deleted after processing, and generated database files are ignored by Git.
 
-## Structure
+## Project structure
 
 ```text
-src/
-  app.js                    Express routes and request flow
-  db.js                     SQLite schema and data access
-  providers/
-    generation-settings.js Generation settings and distribution validation
-    huggingface-provider.js Hugging Face implementation
-    llm-provider.js         Provider contract
-    ollama-provider.js      Ollama implementation
-    prompt-templates.js     Prompt templates and difficulty guidance
-    question-schema.js      Structured response schema
-    parse-questions.js      JSON parsing and validation
-    index.js                Provider factory
-  services/pdf.js           PDF text extraction
-views/                      EJS pages
-public/styles.css           UI styles
-test/                       Node test runner tests
+lecture-quiz/
+├── src/
+│   ├── app.js                 # Express routes and application flow
+│   ├── db.js                  # SQLite schema and data access
+│   ├── middleware/            # Authentication middleware
+│   ├── providers/             # Hugging Face, Ollama, prompts and validation
+│   ├── routes/                # Authentication routes
+│   └── services/              # PDF extraction and logging
+├── views/                     # EJS pages
+├── public/                    # Browser JavaScript and CSS
+├── test/                      # Node test-runner tests
+├── data/                      # Local SQLite data
+└── uploads/                   # Temporary PDF uploads
 ```
 
-## Adding another LLM provider
+## Provider architecture
 
-Create a class in `src/providers` that extends `LlmProvider` and implements:
+The generation layer is isolated under `src/providers`. A provider receives lecture text and normalized generation settings, then returns validated questions:
 
 ```js
-async generateQuestions({
-  text,
-  count,
-  difficulty,
-  types,
-  distribution
-}) {
-  // Call the remote model, then return:
-  // [{ type, difficulty, question, options, correctAnswer,
-}
+generateQuestions({ text, count, difficulty, types, distribution })
 ```
 
-Use `parseQuestions` to apply the same response validation, then change `createLlmProvider()` in `src/providers/index.js`. The upload, database, and exam layers do not need to change. API keys should be read from environment variables and never committed.
+This keeps the application ready for another provider without rewriting upload, database, authentication, or quiz routes.
 
-## Current limits
+## Current limitations
 
-- Question generation uses the first `MAX_PDF_CHARS` characters, rather than semantic chunking.
-- There is no user authentication; quiz URLs are accessible to anyone who knows the ID.
-- This first version supports embedded PDF text only, not OCR.
+- Only PDFs with embedded text are supported; scanned documents require OCR first.
+- Only the first `MAX_PDF_CHARS` characters are used; semantic document chunking is not implemented.
+- Fill-in and short answers use normalized exact matching, so equivalent alternative wording may be marked incorrect.
+- Generated source excerpts improve traceability but do not independently prove factual correctness.
+- The default in-memory session store is suitable for local development, not production deployment.
+- The Ollama fallback still focuses on the older multiple-choice generation flow.
+
+## Tests
+
+```bash
+npm test
+```
+
+Tests mock hosted-model responses and should not consume Hugging Face inference tokens.

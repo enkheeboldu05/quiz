@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lecture-Based Quiz Generator — Phase 1 Poster</title>
+  <title>AI-Powered Lecture-Based Quiz Platform — Phase 1 Poster</title>
   <style>
     * { box-sizing: border-box; }
 
@@ -71,7 +71,7 @@
     }
 
     .screenshot {
-      height: 40mm;
+      height: 32mm;
       margin: 0;
       overflow: hidden;
       border: 1px solid #999;
@@ -151,14 +151,14 @@
 <body>
   <main class="poster">
     <p class="template-label">Phase 1 Project</p>
-    <h1>Lecture-Based Quiz Generator</h1>
+    <h1>AI-Powered Lecture-Based Quiz Platform</h1>
     <p class="authors">배성빈 · 앤코벌드</p>
 
     <div class="layout">
       <div class="column">
         <section class="description">
           <h2>Description (one sentence):</h2>
-          <p>A web application that generates quizzes from lecture PDFs with adjustable difficulty, four question types, and simple user authentication.</p>
+          <p>A web application that generates practice quizzes from lecture PDF files.</p>
         </section>
 
         <section>
